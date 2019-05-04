@@ -22,29 +22,12 @@ enum custom_keycodes {
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-  [0] = LAYOUT( /* Base */
-		// KC_EQL, KC_1, KC_2, KC_3, KC_4, KC_5, KC_GRV,
-		// KC_TAB, KC_Q, KC_W, KC_E, KC_R, KC_T, KC_RCBR,
-		// KC_CAPS, KC_A, KC_S, KC_D, KC_F, KC_G, KC_NO,
-		// KC_ESC, KC_LSFT, KC_Z, KC_X, KC_C, KC_V, KC_B,
-		// KC_LCTL, KC_NO, KC_LEFT, KC_RGHT, KC_LALT, KC_SPC, KC_BSPC,
-		// KC_NO, KC_6, KC_7, KC_8, KC_9, KC_0, KC_MINS,
-		// KC_LCBR, KC_Y, KC_U, KC_I, KC_O, KC_P, KC_BSLS,
-		// KC_QUOT, KC_H, KC_J, KC_K, KC_L, KC_SCLN, KC_LCTL,
-		// KC_N, KC_M, KC_COMM, KC_DOT, KC_QUES, KC_LSFT, KC_DEL,
-		// KC_LALT, KC_ENT, KC_LALT, KC_UP, KC_DOWN, KC_NO, KC_MENU
-    KC_A, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7,
-    KC_B, KC_2, KC_3, KC_4, KC_5, KC_6, KC_8,
-    KC_C, KC_2, KC_3, KC_4, KC_5, KC_6, KC_9,
-    KC_D, KC_2, KC_3, KC_4, KC_5, KC_6, KC_0,
-    KC_E, KC_2, KC_3, KC_4, KC_5, KC_6, KC_1,
-
-    KC_F, KC_2, KC_3, KC_4, KC_5, KC_6, KC_M,
-    KC_G, KC_2, KC_3, KC_4, KC_5, KC_6, KC_N,
-    KC_H, KC_2, KC_3, KC_4, KC_5, KC_6, KC_O,
-    KC_I, KC_2, KC_3, KC_4, KC_5, KC_6, KC_P,
-    KC_K, KC_2, KC_3, KC_4, KC_5, KC_6, KC_Q
-    ),
+  [0] = LAYOUT(
+		KC_EQL, KC_1, KC_2, KC_3, KC_4, KC_5, KC_GRV, KC_PGUP, KC_6, KC_7, KC_8, KC_9, KC_0, KC_MINS,
+		KC_TAB, KC_Q, KC_W, KC_E, KC_R, KC_T, KC_RBRC, KC_LBRC, KC_Y, KC_U, KC_I, KC_O, KC_P, KC_BSLS,
+		KC_ESC, KC_A, KC_S, KC_D, KC_F, KC_G, KC_PGDN, KC_QUOT, KC_H, KC_J, KC_K, KC_L, KC_SCLN,  MT(MOD_RGUI, KC_QUOT) ,
+		KC_ESC, KC_LSFT, MT(MOD_LCTL, KC_Z), MT(MOD_LGUI, KC_X) , KC_C, KC_V, KC_B, KC_DEL, KC_N, KC_M, KC_COMM, KC_DOT, KC_SLSH, KC_RSFT,
+		KC_LALT, KC_LGUI, KC_LEFT, KC_RGHT, KC_SPC, KC_SPC, KC_BSPC, KC_LALT, KC_ENT, KC_ENT, KC_UP, KC_DOWN, KC_RGUI, KC_RALT)
 };
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
