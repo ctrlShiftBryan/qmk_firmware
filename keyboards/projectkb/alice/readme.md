@@ -19,5 +19,5 @@ make projectkb/alice:ctrlshiftba
 dfu-util --list
 
 # dfu-util to flash
-dfu-util -a 0 -d 0483:df11 -s 0x8000000:leave -D /Users/barendt/QMK/qmk_firmware/projectkb_alice_ctrlshiftba.bin
+dfu-util -a 0 -d 0483:df11 -s 0x8000000:leave -D projectkb_alice_ctrlshiftba.bin
 ```
