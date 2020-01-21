@@ -30,9 +30,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
             MT(MOD_LCTL, KC_GRV), _______,            KC_LEFT,            KC_RGHT, LT(1, KC_SPC), KC_SPC,  KC_BSPC, KC_LALT, KC_ENT,  LT(1, KC_ENT), KC_DOWN, KC_UP, KC_LBRC, KC_RBRC \
   ),
   [1] = LAYOUT( /* Base */
-    RESET, KC_EQL,               KC_F1,              KC_F2,              KC_F3,    KC_F4,         KC_F5,   KC_GRV,  KC_PGUP, KC_F6, KC_F7, KC_F8,    KC_F9,   KC_F10,    KC_F11, KC_F12, \
+    RESET, KC_EQL,               KC_F1,              KC_F2,              KC_F3,    KC_F4,         KC_F5,   KC_INS,  KC_HOME, KC_F6, KC_F7, KC_F8,    KC_F9,   KC_F10,    KC_F11, KC_F12, \
            RGB_MOD,              RGB_HUI,            RGB_SAI,            RGB_VAI,  KC_R,          KC_T,    KC_RBRC, KC_LBRC, KC_Y,  KC_U,  KC_I,     KC_O,    KC_P,      KC_BSLS, \
-           RGB_MODE_PLAIN,       RGB_HUD,            RGB_SAD,            RGB_VAD,  KC_F,          KC_G,    KC_PGDN, KC_QUOT, KC_H,  KC_J,  KC_K,     KC_L,    KC_SCLN,   MT(MOD_RGUI, KC_QUOT),\
+           RGB_MODE_PLAIN,       RGB_HUD,            RGB_SAD,            RGB_VAD,  KC_F,          KC_G,    KC_END,  KC_QUOT, KC_H,  KC_J,  KC_K,     KC_L,    KC_SCLN,   MT(MOD_RGUI, KC_QUOT),\
            RGB_TOG,              MT(MOD_LCTL, KC_Z), MT(MOD_LGUI, KC_X), KC_C,     KC_V,          KC_B,                      KC_N,  KC_M,  KC_COMM,  KC_DOT,  KC_SLSH,   KC_RSFT, \
            MT(MOD_LCTL, KC_GRV), _______,            KC_LEFT,            KC_RGHT, LT(1, KC_SPC),  KC_SPC,  KC_BSPC, KC_LALT, KC_ENT,  LT(1, KC_ENT), KC_DOWN, KC_UP,     KC_LBRC, KC_RBRC \
   ),
