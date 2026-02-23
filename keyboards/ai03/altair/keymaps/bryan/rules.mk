@@ -11,6 +11,3 @@ TRI_LAYER_ENABLE = yes
 
 # Optional: Uncomment for key override support
 # KEY_OVERRIDE_ENABLE = yes
-
-# Shared endpoint for Globe key modifier combos
-KEYBOARD_SHARED_EP = yes

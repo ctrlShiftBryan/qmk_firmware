@@ -12,11 +12,6 @@ enum layers {
     _SETTINGS
 };
 
-// Custom keycodes
-enum custom_keycodes {
-    AP_GLOB = SAFE_RANGE,
-};
-
 // Custom mod-tap configuration matching ZMK behavior
 #define MY_TAPPING_TERM 250
 #define MY_QUICK_TAP_TERM 150
@@ -50,7 +45,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_EQL,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_GRV,  KC_PGUP, KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_MINS,
         KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_RBRC, KC_LBRC, KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_BSLS,
         KC_ESC,  KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_PGDN, KC_QUOT, KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, MT_QUOT,
-        KC_LSFT, MT_Z,    MT_X,    MT_C,    KC_V,    KC_B,    KC_BSPC, AP_GLOB, KC_N,    KC_M,    MT_COMM, MT_DOT,  MT_SLSH, SK_RSFT,
+        KC_LSFT, MT_Z,    MT_X,    MT_C,    KC_V,    KC_B,    KC_BSPC, S(G(KC_W)), KC_N,    KC_M,    MT_COMM, MT_DOT,  MT_SLSH, SK_RSFT,
                                    _______,  _______, SL_NUM,  LT_SPC,  LT_ENT, SL_SYM,  _______, _______
     ),
 
@@ -86,16 +81,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                    _______, _______, _______, _______, _______, _______, _______, _______
     )
 };
-
-// Apple Globe key handler
-bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    switch (keycode) {
-        case AP_GLOB:
-            host_consumer_send(record->event.pressed ? AC_NEXT_KEYBOARD_LAYOUT_SELECT : 0);
-            return false;
-    }
-    return true;
-}
 
 // Configure tapping term for mod-tap keys
 uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
