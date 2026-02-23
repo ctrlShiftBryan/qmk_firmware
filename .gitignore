@@ -121,3 +121,8 @@ compile_commands.json
 via*.json
 /keyboards/**/keymaps/via/*
 /keyboards/**/keymaps/vial/*
+
+# Local dev artifacts
+tmp/
+plans/
+tmux-urls.cfg
