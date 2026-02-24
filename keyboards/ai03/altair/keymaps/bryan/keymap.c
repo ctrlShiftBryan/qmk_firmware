@@ -51,9 +51,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [_SYM] = LAYOUT(
         _______, KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  QK_BOOT,
-        KC_PLUS, KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC, _______, _______, KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, KC_UNDS,
-        KC_PGUP, KC_PGDN, KC_SLSH, KC_BSLS, KC_LPRN, KC_RPRN, KC_END,  KC_HOME, KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, KC_UNDS, KC_DEL,
-        _______, KC_GRV,  KC_LCBR, KC_RCBR, KC_LBRC, KC_RBRC, KC_INS,  _______, KC_TILD, KC_PIPE, KC_LCBR, KC_RCBR, OSM(MOD_RCTL), _______,
+        KC_PLUS, KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_VOLU, _______, _______, KC_CIRC, KC_MPRV, KC_MPLY, KC_MNXT, KC_RPRN, KC_UNDS,
+        KC_PGUP, KC_PGDN, KC_SLSH, KC_BSLS, KC_LPRN, KC_VOLD, KC_END,  KC_HOME, KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, KC_UNDS, KC_DEL,
+        _______, KC_GRV,  KC_LCBR, KC_RCBR, KC_LBRC, KC_MUTE, KC_INS,  _______, KC_TILD, KC_PIPE, KC_LCBR, KC_RCBR, OSM(MOD_RCTL), _______,
                                    _______, _______, _______, KC_BSPC, _______, _______, _______, _______
     ),
 
