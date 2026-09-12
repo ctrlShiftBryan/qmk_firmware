@@ -11,7 +11,8 @@ what the Hyprland keybind does.
     altair_viz.py --render out.png [--layer N]   offline render, no display needed
 
 Protocol (see keymap.c): keyboard sends [0x01, layer] on each layer change and
-in response to a [0x01] request.
+in response to a [0x01] request, and [0x02, row, col, pressed, layer] on every
+key event.
 """
 
 import argparse
@@ -30,6 +31,7 @@ KEYBOARD_JSON = HERE.parent.parent.parent / "keyboard.json"
 USB_VID, USB_PID = 0xA103, 0x0022
 RAW_USAGE_PAGE = bytes([0x06, 0x60, 0xFF])  # Usage Page (0xFF60)
 MSG_LAYER = 0x01
+MSG_KEY = 0x02
 APP_ID = "dev.bryan.AltairViz"
 
 UNIT = 58          # pixels per key unit
@@ -196,10 +198,11 @@ class HidReader(threading.Thread):
     """Background thread: keeps the keyboard connection alive, calls
     on_layer(int) and on_status(str) from its own thread."""
 
-    def __init__(self, on_layer, on_status):
+    def __init__(self, on_layer, on_status, on_key):
         super().__init__(daemon=True)
         self.on_layer = on_layer
         self.on_status = on_status
+        self.on_key = on_key
         self.fd = None
 
     def run(self):
@@ -228,6 +231,8 @@ class HidReader(threading.Thread):
                         break
                     if data[0] == MSG_LAYER and len(data) > 1:
                         self.on_layer(data[1])
+                    elif data[0] == MSG_KEY and len(data) > 4:
+                        self.on_key(data[1], data[2], bool(data[3]), data[4])
             except OSError:
                 pass
             finally:
@@ -253,6 +258,8 @@ THEME = {
     "text_dim": (0.55, 0.55, 0.60),
     "hold": (0.55, 0.80, 0.95),
     "accent": (0.95, 0.65, 0.25),
+    "pressed": (0.95, 0.65, 0.25),
+    "pressed_text": (0.12, 0.10, 0.06),
 }
 
 
@@ -272,7 +279,7 @@ def rounded_rect(cr, x, y, w, h, r):
     cr.close_path()
 
 
-def draw(cr, keymap, geometry, layer, status):
+def draw(cr, keymap, geometry, layer, status, pressed=frozenset(), last=None):
     import gi
     gi.require_version("PangoCairo", "1.0")
     gi.require_version("Pango", "1.0")
@@ -299,6 +306,13 @@ def draw(cr, keymap, geometry, layer, status):
     name = keymap.layer_names[layer] if layer < len(keymap.layer_names) else str(layer)
     text(f"Layer {layer}  ·  {name}", PAD, PAD - 4, 12, THEME["accent"], align="left", weight="bold")
     text(status, w - PAD, PAD - 4, 9, THEME["text_dim"], align="right")
+    if last is not None:
+        last_idx, last_layer = last
+        kc, _ = keymap.effective(last_layer, last_idx)
+        tap, hold = keymap.label(kc)
+        lname = keymap.layer_names[last_layer] if last_layer < len(keymap.layer_names) else str(last_layer)
+        desc = tap + (f" / {hold}" if hold else "") + f"   ({lname})"
+        text("Last: " + desc, w / 2, PAD - 4, 10, THEME["text"], weight="bold")
 
     top = PAD + 30
     for idx, k in enumerate(geometry):
@@ -310,19 +324,28 @@ def draw(cr, keymap, geometry, layer, status):
         transparent = from_layer != layer and layer != 0
         tap, hold = keymap.label(kc)
 
+        is_pressed = idx in pressed
+        is_last = last is not None and last[0] == idx and not is_pressed
         rounded_rect(cr, x, y, kw, kh, 6)
-        cr.set_source_rgb(*(THEME["key_trans"] if transparent else THEME["key"]))
+        if is_pressed:
+            cr.set_source_rgb(*THEME["pressed"])
+        else:
+            cr.set_source_rgb(*(THEME["key_trans"] if transparent else THEME["key"]))
         cr.fill_preserve()
-        cr.set_source_rgb(*THEME["key_border"])
-        cr.set_line_width(1)
+        cr.set_source_rgb(*(THEME["accent"] if is_last else THEME["key_border"]))
+        cr.set_line_width(2.5 if is_last else 1)
         cr.stroke()
 
-        color = THEME["text_dim"] if transparent else THEME["text"]
+        if is_pressed:
+            color = THEME["pressed_text"]
+        else:
+            color = THEME["text_dim"] if transparent else THEME["text"]
         size = 13 if len(tap) <= 2 else (10 if len(tap) <= 6 else 8)
         cy = y + kh / 2 - (6 if hold else 0)
         text(tap, x + kw / 2, cy, size, color, weight="bold" if len(tap) <= 2 else "normal")
         if hold:
-            text(hold, x + kw / 2, y + kh - 11, 7.5, THEME["text_dim"] if transparent else THEME["hold"])
+            hold_color = THEME["pressed_text"] if is_pressed else (THEME["text_dim"] if transparent else THEME["hold"])
+            text(hold, x + kw / 2, y + kh - 11, 7.5, hold_color)
 
 
 # --------------------------------------------------------------------------
@@ -346,6 +369,9 @@ def run_gtk(daemon):
             self.window = None
             self.layer = 0
             self.status = "starting"
+            self.pressed = set()
+            self.last = None  # (geometry index, layer at press time)
+            self.matrix_index = {tuple(k["matrix"]): i for i, k in enumerate(geometry)}
 
         def do_startup(self):
             Gtk.Application.do_startup(self)
@@ -354,6 +380,7 @@ def run_gtk(daemon):
             HidReader(
                 lambda l: GLib.idle_add(self.set_layer, l),
                 lambda s: GLib.idle_add(self.set_status, s),
+                lambda r, c, p, l: GLib.idle_add(self.on_key_event, r, c, p, l),
             ).start()
 
         def do_command_line(self, cmdline):
@@ -370,7 +397,8 @@ def run_gtk(daemon):
             self.area = Gtk.DrawingArea()
             self.area.set_content_width(w)
             self.area.set_content_height(h)
-            self.area.set_draw_func(lambda a, cr, aw, ah: draw(cr, keymap, geometry, self.layer, self.status))
+            self.area.set_draw_func(lambda a, cr, aw, ah: draw(
+                cr, keymap, geometry, self.layer, self.status, self.pressed, self.last))
             self.window.set_child(self.area)
 
             keys = Gtk.EventControllerKey()
@@ -396,6 +424,17 @@ def run_gtk(daemon):
             self.layer = layer
             self.area.queue_draw()
 
+        def on_key_event(self, row, col, is_pressed, layer):
+            idx = self.matrix_index.get((row, col))
+            if idx is None:
+                return
+            if is_pressed:
+                self.pressed.add(idx)
+                self.last = (idx, layer)
+            else:
+                self.pressed.discard(idx)
+            self.area.queue_draw()
+
         def set_status(self, status):
             self.status = status
             self.area.queue_draw()
@@ -410,7 +449,7 @@ def render_png(out, layer):
     geometry = load_geometry()
     w, h = canvas_size(geometry)
     surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, w, h)
-    draw(cairo.Context(surf), keymap, geometry, layer, "offline render")
+    draw(cairo.Context(surf), keymap, geometry, layer, "offline render", {17}, (30, layer))
     surf.write_to_png(out)
     print(f"wrote {out} ({w}x{h}), layers: {keymap.layer_names}")
 

@@ -92,8 +92,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 // Raw HID layer reporting for the host-side keymap visualizer.
 // Host -> keyboard: [0x01]         request current layer
 // Keyboard -> host: [0x01, layer]  sent on every layer change and on request
+// Keyboard -> host: [0x02, row, col, pressed, layer]  sent on every key event
 // ---------------------------------------------------------------------------
 #define VIZ_MSG_LAYER 0x01
+#define VIZ_MSG_KEY   0x02
 
 static void viz_send_layer(layer_state_t state) {
     uint8_t report[32] = {0};  // RAW_EPSIZE
@@ -108,8 +110,19 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
     }
 }
 
+static void viz_send_key(keyrecord_t *record) {
+    uint8_t report[32] = {0};  // RAW_EPSIZE
+    report[0] = VIZ_MSG_KEY;
+    report[1] = record->event.key.row;
+    report[2] = record->event.key.col;
+    report[3] = record->event.pressed;
+    report[4] = get_highest_layer(layer_state | default_layer_state);
+    raw_hid_send(report, sizeof(report));
+}
+
 // Apple Globe key handler
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    viz_send_key(record);
     switch (keycode) {
         case AP_GLOB:
             host_consumer_send(record->event.pressed ? AC_NEXT_KEYBOARD_LAYOUT_SELECT : 0);
