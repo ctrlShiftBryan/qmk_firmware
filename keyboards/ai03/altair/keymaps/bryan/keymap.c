@@ -2,6 +2,7 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 
 #include QMK_KEYBOARD_H
+#include "raw_hid.h"
 
 // Custom keycodes
 enum custom_keycodes {
@@ -87,6 +88,26 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     )
 };
 
+// ---------------------------------------------------------------------------
+// Raw HID layer reporting for the host-side keymap visualizer.
+// Host -> keyboard: [0x01]         request current layer
+// Keyboard -> host: [0x01, layer]  sent on every layer change and on request
+// ---------------------------------------------------------------------------
+#define VIZ_MSG_LAYER 0x01
+
+static void viz_send_layer(layer_state_t state) {
+    uint8_t report[32] = {0};  // RAW_EPSIZE
+    report[0] = VIZ_MSG_LAYER;
+    report[1] = get_highest_layer(state);
+    raw_hid_send(report, sizeof(report));
+}
+
+void raw_hid_receive(uint8_t *data, uint8_t length) {
+    if (length > 0 && data[0] == VIZ_MSG_LAYER) {
+        viz_send_layer(layer_state | default_layer_state);
+    }
+}
+
 // Apple Globe key handler
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
@@ -119,7 +140,10 @@ uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
     }
 }
 
-// Implement conditional layer: when SYM + NUM are both active, activate NAV
+// Implement conditional layer: when SYM + NUM are both active, activate NAV.
+// Then report the resulting layer to the host-side visualizer.
 layer_state_t layer_state_set_user(layer_state_t state) {
-    return update_tri_layer_state(state, _SYM, _NUM, _NAV);
+    state = update_tri_layer_state(state, _SYM, _NUM, _NAV);
+    viz_send_layer(state | default_layer_state);
+    return state;
 }

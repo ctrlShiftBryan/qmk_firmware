@@ -11,3 +11,6 @@ TRI_LAYER_ENABLE = yes
 
 # Optional: Uncomment for key override support
 # KEY_OVERRIDE_ENABLE = yes
+
+# Raw HID: report the active layer to the host-side keymap visualizer
+RAW_ENABLE = yes

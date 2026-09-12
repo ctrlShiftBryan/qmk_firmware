@@ -1,0 +1,3 @@
+# Let the logged-in seat user open the Altair's raw HID interface (used by altair_viz.py).
+# Install: sudo cp 70-altair-viz.rules /etc/udev/rules.d/ && sudo udevadm control --reload && sudo udevadm trigger
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="a103", ATTRS{idProduct}=="0022", TAG+="uaccess"
