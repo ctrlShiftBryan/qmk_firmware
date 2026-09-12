@@ -4,11 +4,6 @@
 #include QMK_KEYBOARD_H
 #include "raw_hid.h"
 
-// Custom keycodes
-enum custom_keycodes {
-    AP_GLOB = SAFE_RANGE,
-};
-
 // Layer names for readability
 enum layers {
     _DEFAULT,
@@ -51,7 +46,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_EQL,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_GRV,  KC_PGUP, KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_MINS,
         KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_RBRC, KC_LBRC, KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_BSLS,
         KC_ESC,  KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_PGDN, KC_QUOT, KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, MT_QUOT,
-        KC_LSFT, MT_Z,    MT_X,    MT_C,    KC_V,    KC_B,    KC_BSPC, AP_GLOB, KC_N,    KC_M,    MT_COMM, MT_DOT,  MT_SLSH, SK_RSFT,
+        KC_LSFT, MT_Z,    MT_X,    MT_C,    KC_V,    KC_B,    KC_BSPC, KC_F13,  KC_N,    KC_M,    MT_COMM, MT_DOT,  MT_SLSH, SK_RSFT,
                                    KC_LEFT, KC_RGHT, SL_NUM,  LT_SPC,  LT_ENT, SL_SYM,  KC_DOWN, KC_UP
     ),
 
@@ -120,14 +115,11 @@ static void viz_send_key(keyrecord_t *record) {
     raw_hid_send(report, sizeof(report));
 }
 
-// Apple Globe key handler
+// Report every keypress to the host-side visualizer.
+// (The Globe-position key is KC_F13 in the layout: Wispr Flow push-to-talk on
+// the Linux host. Overlook keeps F13 host-side and Hyprland swallows it.)
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     viz_send_key(record);
-    switch (keycode) {
-        case AP_GLOB:
-            host_consumer_send(record->event.pressed ? AC_NEXT_KEYBOARD_LAYOUT_SELECT : 0);
-            return false;
-    }
     return true;
 }
 

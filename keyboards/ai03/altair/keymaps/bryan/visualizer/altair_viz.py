@@ -60,8 +60,7 @@ KC_LABELS = {
     "KC_VOLU": "Vol+", "KC_VOLD": "Vol-", "KC_MUTE": "Mute",
     "KC_MPRV": "⏮", "KC_MPLY": "⏯", "KC_MNXT": "⏭",
     "KC_WBAK": "Back", "KC_WFWD": "Fwd",
-    "QK_BOOT": "BOOT", "AP_GLOB": "🌐",
-    "KC_MISS": "Mission", "KC_LAUNCH": "Launch",
+    "QK_BOOT": "BOOT",
 }
 MOD_LABELS = {
     "LCTL": "Ctrl", "RCTL": "Ctrl", "LSFT": "Shift", "RSFT": "Shift",
