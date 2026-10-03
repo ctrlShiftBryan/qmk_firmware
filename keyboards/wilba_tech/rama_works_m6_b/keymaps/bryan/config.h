@@ -2,5 +2,5 @@
 
 // Double-tap window for ports 7 and 8. Measured double taps on this pad
 // were 310-375 ms apart, well past QMK's 200 ms default. Single taps on
-// keys 1 and 4 wait this long before switching.
+// keys 1, 4 and 6 wait this long before switching.
 #define TAPPING_TERM 450
