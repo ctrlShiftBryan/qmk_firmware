@@ -4,3 +4,4 @@
 # warnings as warnings.
 SEND_STRING_ENABLE = no
 EXTRAFLAGS += -Wno-error
+TAP_DANCE_ENABLE = yes
