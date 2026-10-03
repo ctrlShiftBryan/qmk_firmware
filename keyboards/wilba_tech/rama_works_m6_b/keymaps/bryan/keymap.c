@@ -3,19 +3,19 @@
 
 // KVM remote. The switch selects a port on Scroll Lock, Scroll Lock,
 // <port number>. Each key sends that whole sequence with a top-row
-// digit: a tap selects ports 1-6, a double tap on the two top corners
+// digit: a tap selects ports 1-6, a double tap on the two left keys
 // selects 7 and 8. The last key pressed stays lit: cyan for a tap,
 // red for a double tap.
 enum custom_keycodes {
     KVM_2 = SAFE_RANGE,
-    KVM_4,
+    KVM_3,
     KVM_5,
     KVM_6,
 };
 
 enum tap_dances {
     TD_1_7,
-    TD_3_8,
+    TD_4_8,
 };
 
 // The switch misses presses that arrive back to back, so space them out.
@@ -26,8 +26,8 @@ enum tap_dances {
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     LAYOUT(
-        TD(TD_1_7), KVM_2, TD(TD_3_8),
-        KVM_4,      KVM_5, KVM_6),
+        TD(TD_1_7), KVM_2, KVM_3,
+        TD(TD_4_8), KVM_5, KVM_6),
 };
 
 // LED index of each key, in LAYOUT order (see wt_rgb_backlight.c).
@@ -59,14 +59,14 @@ static void td_1_7(tap_dance_state_t *state, void *user_data) {
     else                   kvm_select(7, 1, RED);
 }
 
-static void td_3_8(tap_dance_state_t *state, void *user_data) {
-    if (state->count == 1) kvm_select(3, 3, CYAN);
-    else                   kvm_select(8, 3, RED);
+static void td_4_8(tap_dance_state_t *state, void *user_data) {
+    if (state->count == 1) kvm_select(4, 4, CYAN);
+    else                   kvm_select(8, 4, RED);
 }
 
 tap_dance_action_t tap_dance_actions[] = {
     [TD_1_7] = ACTION_TAP_DANCE_FN(td_1_7),
-    [TD_3_8] = ACTION_TAP_DANCE_FN(td_3_8),
+    [TD_4_8] = ACTION_TAP_DANCE_FN(td_4_8),
 };
 
 void keyboard_post_init_user(void) {
@@ -88,7 +88,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     if (!record->event.pressed) return true;
     switch (keycode) {
         case KVM_2: kvm_select(2, 2, CYAN); return false;
-        case KVM_4: kvm_select(4, 4, CYAN); return false;
+        case KVM_3: kvm_select(3, 3, CYAN); return false;
         case KVM_5: kvm_select(5, 5, CYAN); return false;
         case KVM_6: kvm_select(6, 6, CYAN); return false;
     }
