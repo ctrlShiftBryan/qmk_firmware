@@ -4,7 +4,8 @@
 // KVM remote. The switch selects a port on Scroll Lock, Scroll Lock,
 // <port number>. Each key sends that whole sequence with a top-row
 // digit: a tap selects ports 1-6, a double tap on the two left keys
-// selects 7 and 8, and a double tap on key 6 sends the hotkey with F11.
+// selects 7 and 8, and a double tap on key 6 sends the hotkey with B, 0
+// (buzzer off, found by trial on the NK65).
 // The last key pressed stays lit: cyan for a tap, red for a double tap.
 enum custom_keycodes {
     KVM_2 = SAFE_RANGE,
@@ -15,7 +16,7 @@ enum custom_keycodes {
 enum tap_dances {
     TD_1_7,
     TD_4_8,
-    TD_6_F11,
+    TD_6_BEEP,
 };
 
 // The switch misses presses that arrive back to back, so space them out.
@@ -27,7 +28,7 @@ enum tap_dances {
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     LAYOUT(
         TD(TD_1_7), KVM_2, KVM_3,
-        TD(TD_4_8), KVM_5, TD(TD_6_F11)),
+        TD(TD_4_8), KVM_5, TD(TD_6_BEEP)),
 };
 
 // LED index of each key, in LAYOUT order (see wt_rgb_backlight.c).
@@ -69,15 +70,29 @@ static void td_4_8(tap_dance_state_t *state, void *user_data) {
     else                   kvm_select(8, 4, RED);
 }
 
-static void td_6_f11(tap_dance_state_t *state, void *user_data) {
+// Scroll Lock, Scroll Lock, B, 0: turns the switch's buzzer off.
+static void kvm_beep_off(uint8_t key, uint8_t hue) {
+    tap_code(KC_SCRL);
+    wait_ms(KVM_GAP_MS);
+    tap_code(KC_SCRL);
+    wait_ms(KVM_GAP_MS);
+    tap_code(KC_B);
+    wait_ms(KVM_GAP_MS);
+    tap_code(KC_0);
+
+    lit_led = key_led[key - 1];
+    lit_rgb = hsv_to_rgb((hsv_t){.h = hue, .s = 255, .v = LED_V});
+}
+
+static void td_6_beep(tap_dance_state_t *state, void *user_data) {
     if (state->count == 1) kvm_select(6, 6, CYAN);
-    else                   kvm_hotkey(KC_F11, 6, RED);
+    else                   kvm_beep_off(6, RED);
 }
 
 tap_dance_action_t tap_dance_actions[] = {
     [TD_1_7] = ACTION_TAP_DANCE_FN(td_1_7),
     [TD_4_8] = ACTION_TAP_DANCE_FN(td_4_8),
-    [TD_6_F11] = ACTION_TAP_DANCE_FN(td_6_f11),
+    [TD_6_BEEP] = ACTION_TAP_DANCE_FN(td_6_beep),
 };
 
 void keyboard_post_init_user(void) {
